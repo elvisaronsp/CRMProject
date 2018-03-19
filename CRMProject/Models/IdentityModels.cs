@@ -21,7 +21,7 @@ namespace CRMProject.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("CRMProjectRealestateDB", throwIfV1Schema: false)
         {
         }
 
@@ -29,5 +29,10 @@ namespace CRMProject.Models
         {
             return new ApplicationDbContext();
         }
+
+        public DbSet<BusinessCustomer> BusinessCustomer {get; set;}
+        public DbSet<IndividualCustomer> IndividualCustomer { get; set; }
+        public DbSet<SalesAgent> SalesAgent { get; set; }
+        public DbSet<Realestate> Realestate { get; set; }
     }
 }
