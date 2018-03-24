@@ -2,7 +2,7 @@
 
 namespace CRMProject.Interfaces
 {
-    internal interface IGenericIndividualCustomerRepository: IAbstractRepository<IndividualCustomer>
+    public interface IGenericIndividualCustomerRepository: IAbstractRepository<IndividualCustomer>
     {
     }
 }

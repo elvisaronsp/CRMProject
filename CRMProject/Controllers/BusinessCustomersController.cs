@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using CRMProject.Interfaces;
 using CRMProject.Models;
 
 namespace CRMProject.Controllers
@@ -14,7 +15,7 @@ namespace CRMProject.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-
+        public readonly IGenericBusinessCustomerRepository genericBusinessCustomerRepository;
 
         // GET: BusinessCustomers
         public ActionResult Index()
