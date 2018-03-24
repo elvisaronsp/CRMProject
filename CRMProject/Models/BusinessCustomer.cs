@@ -18,7 +18,8 @@ namespace CRMProject.Models
 
         public string Adress { get; set; }
 
-       
+        public int SalesAgentId { get; set; }
+        [ForeignKey("SalesAgentId")]
         public virtual SalesAgent SalesAgent { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CRMProject.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CRMProject.Models
 {
@@ -16,6 +17,7 @@ namespace CRMProject.Models
 
         public string PhoneNumber { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime HireDate { get; set; }
 
         public decimal SaleValue { get; set; }

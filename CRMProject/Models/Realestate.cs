@@ -1,6 +1,7 @@
 ﻿using CRMProject.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -17,6 +18,7 @@ namespace CRMProject.Models
 
         public decimal DetailPrice { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime RealeseDate { get; set; }
 
         public bool Available { get; set; }

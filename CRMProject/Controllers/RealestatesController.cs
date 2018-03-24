@@ -14,19 +14,18 @@ namespace CRMProject.Controllers
 {
     public class RealestatesController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private readonly GenericRealestateRepository genericRealestasteRepository;
 
+        public readonly IGenericRealestateRepository genericRealestateRepository;
 
-        public RealestatesController (GenericRealestateRepository genericRealestateRepository)
+        public RealestatesController(IGenericRealestateRepository genericRealestateRepository)
         {
-            
+            this.genericRealestateRepository = genericRealestateRepository;
         }
 
         // GET: Realestates
         public ActionResult Index()
         {
-            return View(db.Realestate.ToList());
+            return View(genericRealestateRepository.GetWhere(x=>x.RealestateId>0));
         }
 
         // GET: Realestates/Details/5
@@ -36,7 +35,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Realestate realestate = db.Realestate.Find(id);
+            Realestate realestate = genericRealestateRepository.GetWhere(x=>x.RealestateId == id).FirstOrDefault();
             if (realestate == null)
             {
                 return HttpNotFound();
@@ -51,15 +50,14 @@ namespace CRMProject.Controllers
         }
 
         // POST: Realestates/Create
-       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create( Realestate realestate)
         {
             if (ModelState.IsValid)
             {
-                db.Realestate.Add(realestate);
-                db.SaveChanges();
+                genericRealestateRepository.Create(realestate);
+                
                 return RedirectToAction("Index");
             }
 
@@ -73,7 +71,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Realestate realestate = db.Realestate.Find(id);
+            Realestate realestate = genericRealestateRepository.GetWhere(x => x.RealestateId == id).FirstOrDefault();
             if (realestate == null)
             {
                 return HttpNotFound();
@@ -89,8 +87,8 @@ namespace CRMProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(realestate).State = EntityState.Modified;
-                db.SaveChanges();
+                genericRealestateRepository.Update(realestate);
+
                 return RedirectToAction("Index");
             }
             return View(realestate);
@@ -103,7 +101,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Realestate realestate = db.Realestate.Find(id);
+            Realestate realestate = genericRealestateRepository.GetWhere(x => x.RealestateId == id).FirstOrDefault();
             if (realestate == null)
             {
                 return HttpNotFound();
@@ -116,19 +114,14 @@ namespace CRMProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Realestate realestate = db.Realestate.Find(id);
-            db.Realestate.Remove(realestate);
-            db.SaveChanges();
+            Realestate realestate = genericRealestateRepository.GetWhere(x => x.RealestateId == id).FirstOrDefault();
+            genericRealestateRepository.Delete(realestate);
+
             return RedirectToAction("Index");
+
+            
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        
     }
 }
