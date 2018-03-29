@@ -9,5 +9,13 @@ namespace CRMProject.BusinessLogic
 {
     public class IndividualCustomerValidation : AbstractValidator<IndividualCustomer>
     {
+        public  IndividualCustomerValidation()
+        {
+            RuleFor(x => x.Adress)
+                .NotEmpty()
+                .WithMessage("This Cannot Be Empty");
+        }
+
+       
     }
 }

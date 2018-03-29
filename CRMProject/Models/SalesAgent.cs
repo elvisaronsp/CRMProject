@@ -23,7 +23,7 @@ namespace CRMProject.Models
         [DataType(DataType.Date)]
         public DateTime HireDate { get; set; }
 
-        public decimal SaleValue { get; set; }
+        public double SaleValue { get; set; }
 
         public int Sales { get; set; }
 

@@ -14,6 +14,8 @@ namespace CRMProject.Models
 
         public string ContactPhoneNumber { get; set; }
 
+        public string ContactEmail { get; set; }
+
         public string City { get; set; }
 
         public string Adress { get; set; }
