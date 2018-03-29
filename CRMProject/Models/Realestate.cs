@@ -14,9 +14,9 @@ namespace CRMProject.Models
 
         public string Type { get; set; }
 
-        public decimal BasePrice { get; set; }
+        public int BasePrice { get; set; }
 
-        public decimal DetailPrice { get; set; }
+        public int DetailPrice { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime RealeseDate { get; set; }

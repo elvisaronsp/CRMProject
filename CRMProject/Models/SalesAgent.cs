@@ -9,6 +9,7 @@ namespace CRMProject.Models
     {
         public int SalesAgentId { get; set; }
 
+        
         public string Name { get; set; }
 
         public string Surname { get; set; }
@@ -17,12 +18,15 @@ namespace CRMProject.Models
 
         public string PhoneNumber { get; set; }
 
+        public string Email { get; set; }
+
         [DataType(DataType.Date)]
         public DateTime HireDate { get; set; }
 
         public decimal SaleValue { get; set; }
 
         public int Sales { get; set; }
+
 
         public ICollection<IndividualCustomer> IndividualCustomers { get; set; }
 

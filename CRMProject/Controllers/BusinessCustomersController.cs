@@ -8,20 +8,30 @@ using System.Web;
 using System.Web.Mvc;
 using CRMProject.Interfaces;
 using CRMProject.Models;
+using CRMProject.Repository;
 
 namespace CRMProject.Controllers
 {
     public class BusinessCustomersController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
 
-        public readonly IGenericBusinessCustomerRepository genericBusinessCustomerRepository;
+        private readonly IBusinessCustomerRepository _businessCustomerRepository;
+        private readonly ISalesAgentRepository _salesAgentRepository;
+
+        public BusinessCustomersController(IBusinessCustomerRepository _businessCustomerRepository, ISalesAgentRepository _salesAgentRepository)
+        {
+            this._businessCustomerRepository = _businessCustomerRepository;
+            this._salesAgentRepository = _salesAgentRepository;
+        }
 
         // GET: BusinessCustomers
         public ActionResult Index()
         {
-            var businessCustomer = db.BusinessCustomer.Include(b => b.SalesAgent);
-            return View(businessCustomer.ToList());
+            var customers = _businessCustomerRepository.Get()
+                .Include(x => x.SalesAgent)
+                .Where(x => x.BusinessCustomerId > 0)
+                .Fetch();
+            return View(customers);
         }
 
         // GET: BusinessCustomers/Details/5
@@ -31,7 +41,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            BusinessCustomer businessCustomer = db.BusinessCustomer.Find(id);
+            BusinessCustomer businessCustomer = _businessCustomerRepository.Get().Where(x => x.BusinessCustomerId == id).Fetch().FirstOrDefault();
             if (businessCustomer == null)
             {
                 return HttpNotFound();
@@ -42,25 +52,24 @@ namespace CRMProject.Controllers
         // GET: BusinessCustomers/Create
         public ActionResult Create()
         {
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name");
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name");
             return View();
         }
 
         // POST: BusinessCustomers/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "BusinessCustomerId,CompanyName,ContactPhoneNumber,City,Adress,SalesAgentId")] BusinessCustomer businessCustomer)
+        public ActionResult Create( BusinessCustomer businessCustomer)
         {
             if (ModelState.IsValid)
             {
-                db.BusinessCustomer.Add(businessCustomer);
-                db.SaveChanges();
+                _businessCustomerRepository.Create(businessCustomer);
+                
                 return RedirectToAction("Index");
             }
 
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name", businessCustomer.SalesAgentId);
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name", businessCustomer.SalesAgentId);
             return View(businessCustomer);
         }
 
@@ -71,29 +80,27 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            BusinessCustomer businessCustomer = db.BusinessCustomer.Find(id);
+            BusinessCustomer businessCustomer = _businessCustomerRepository.Get().Include(x => x.SalesAgent).Where(x => x.BusinessCustomerId == id).Fetch().FirstOrDefault(); 
             if (businessCustomer == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name", businessCustomer.SalesAgentId);
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name", businessCustomer.SalesAgentId);
             return View(businessCustomer);
         }
 
         // POST: BusinessCustomers/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "BusinessCustomerId,CompanyName,ContactPhoneNumber,City,Adress,SalesAgentId")] BusinessCustomer businessCustomer)
+        public ActionResult Edit(BusinessCustomer businessCustomer)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(businessCustomer).State = EntityState.Modified;
-                db.SaveChanges();
+                _businessCustomerRepository.Update(businessCustomer);
                 return RedirectToAction("Index");
             }
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name", businessCustomer.SalesAgentId);
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name", businessCustomer.SalesAgentId);
             return View(businessCustomer);
         }
 
@@ -104,7 +111,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            BusinessCustomer businessCustomer = db.BusinessCustomer.Find(id);
+            BusinessCustomer businessCustomer = _businessCustomerRepository.Get().Include(x => x.SalesAgent).Where(x => x.BusinessCustomerId == id).Fetch().FirstOrDefault(); 
             if (businessCustomer == null)
             {
                 return HttpNotFound();
@@ -113,23 +120,17 @@ namespace CRMProject.Controllers
         }
 
         // POST: BusinessCustomers/Delete/5
+
+        //[Authorize(Roles ="Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            BusinessCustomer businessCustomer = db.BusinessCustomer.Find(id);
-            db.BusinessCustomer.Remove(businessCustomer);
-            db.SaveChanges();
+            BusinessCustomer businessCustomer = _businessCustomerRepository.Get().Include(x => x.SalesAgent).Where(x => x.BusinessCustomerId == id).Fetch().FirstOrDefault();
+            _businessCustomerRepository.Delete(businessCustomer);
             return RedirectToAction("Index");
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        
     }
 }

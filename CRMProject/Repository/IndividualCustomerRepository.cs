@@ -7,7 +7,7 @@ using System.Web;
 
 namespace CRMProject.Repository
 {
-    public class GenericIndividualCustomerRepository: AbstractRepository<IndividualCustomer>, IGenericIndividualCustomerRepository
+    public class IndividualCustomerRepository: AbstractRepository<IndividualCustomer>, IIndividualCustomerRepository
     {
     }
 }

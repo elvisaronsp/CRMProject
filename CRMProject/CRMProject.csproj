@@ -237,6 +237,10 @@
     <Compile Include="Migrations\201803241159457_ChangesInSalesAgentId.Designer.cs">
       <DependentUpon>201803241159457_ChangesInSalesAgentId.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803281337184_EmailAddedToSalesAgentClass.cs" />
+    <Compile Include="Migrations\201803281337184_EmailAddedToSalesAgentClass.Designer.cs">
+      <DependentUpon>201803281337184_EmailAddedToSalesAgentClass.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BusinessCustomer.cs" />
@@ -249,15 +253,15 @@
     <Compile Include="Models\SalesmanTasks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\AbstractRepository.cs" />
-    <Compile Include="Repository\GenericBusinessCustomerRepository.cs" />
-    <Compile Include="Repository\GenericIndividualCustomerRepository.cs" />
-    <Compile Include="Repository\GenericRealestateRepository.cs" />
+    <Compile Include="Repository\BusinessCustomerRepository.cs" />
+    <Compile Include="Repository\IndividualCustomerRepository.cs" />
+    <Compile Include="Repository\RealestateRepository.cs" />
     <Compile Include="Interfaces\IAbstractRepository.cs" />
-    <Compile Include="Interfaces\IGenericRealestateRepository.cs" />
-    <Compile Include="Repository\GenericSalesAgentRepository.cs" />
-    <Compile Include="Interfaces\IGenericBusinessCustomerRepository.cs" />
-    <Compile Include="Interfaces\IGenericIndividualCustomerRepository.cs" />
-    <Compile Include="Interfaces\IGenericSalesAgentRepository.cs" />
+    <Compile Include="Interfaces\IRealestateRepository.cs" />
+    <Compile Include="Repository\SalesAgentRepository.cs" />
+    <Compile Include="Interfaces\IBusinessCustomerRepository.cs" />
+    <Compile Include="Interfaces\IIndividualCustomerRepository.cs" />
+    <Compile Include="Interfaces\ISalesAgentRepository.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -360,6 +364,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803241159457_ChangesInSalesAgentId.resx">
       <DependentUpon>201803241159457_ChangesInSalesAgentId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803281337184_EmailAddedToSalesAgentClass.resx">
+      <DependentUpon>201803281337184_EmailAddedToSalesAgentClass.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

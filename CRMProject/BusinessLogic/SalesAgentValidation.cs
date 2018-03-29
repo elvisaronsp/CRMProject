@@ -25,6 +25,21 @@ namespace CRMProject.BusinessLogic
                 .NotEmpty()
                 .WithMessage("This Cannot Be Empty");
 
+
+            RuleFor(x => x.HireDate)
+                .NotEmpty()
+                .WithMessage("This Cannot Be Empty");
+
+
+            RuleFor(x => x.PhoneNumber)
+                .NotEmpty()
+                .WithMessage("This Cannot Be Empty");
+
+            RuleFor(x => x.Email)
+               .NotEmpty()
+               .EmailAddress()
+               .WithMessage("This Cannot Be Empty");
+
             //TODO finish and do other validations
 
 

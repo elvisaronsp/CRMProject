@@ -6,19 +6,27 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using CRMProject.Interfaces;
 using CRMProject.Models;
 
 namespace CRMProject.Controllers
 {
     public class IndividualCustomersController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private readonly IIndividualCustomerRepository _individualCustomerRepository;
+        private readonly ISalesAgentRepository _salesAgentRepository;
+
+        public IndividualCustomersController(IIndividualCustomerRepository _individualCustomerRepository, ISalesAgentRepository _salesAgentRepository)
+        {
+            this._individualCustomerRepository = _individualCustomerRepository;
+            this._salesAgentRepository = _salesAgentRepository;
+        }
 
         // GET: IndividualCustomers
         public ActionResult Index()
         {
-            var individualCustomer = db.IndividualCustomer.Include(i => i.SalesAgent);
-            return View(individualCustomer.ToList());
+            var customers = _individualCustomerRepository.Get().Include(x => x.SalesAgent).Where(x => x.IndividualCustomerId > 0).Fetch();
+            return View(customers);
         }
 
         // GET: IndividualCustomers/Details/5
@@ -28,7 +36,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            IndividualCustomer individualCustomer = db.IndividualCustomer.Find(id);
+            IndividualCustomer individualCustomer = _individualCustomerRepository.Get().Where(x=>x.IndividualCustomerId==id).Fetch().FirstOrDefault();
             if (individualCustomer == null)
             {
                 return HttpNotFound();
@@ -39,25 +47,22 @@ namespace CRMProject.Controllers
         // GET: IndividualCustomers/Create
         public ActionResult Create()
         {
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name");
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name");
             return View();
         }
 
         // POST: IndividualCustomers/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "IndividualCustomerId,Name,Surname,PhoneNumber,City,Adress,SalesAgentId")] IndividualCustomer individualCustomer)
         {
             if (ModelState.IsValid)
             {
-                db.IndividualCustomer.Add(individualCustomer);
-                db.SaveChanges();
+                _individualCustomerRepository.Create(individualCustomer);
                 return RedirectToAction("Index");
             }
 
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name", individualCustomer.SalesAgentId);
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name", individualCustomer.SalesAgentId);
             return View(individualCustomer);
         }
 
@@ -68,29 +73,26 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            IndividualCustomer individualCustomer = db.IndividualCustomer.Find(id);
+            IndividualCustomer individualCustomer = _individualCustomerRepository.Get().Where(x => x.IndividualCustomerId == id).Fetch().FirstOrDefault();
             if (individualCustomer == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name", individualCustomer.SalesAgentId);
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name", individualCustomer.SalesAgentId);
             return View(individualCustomer);
         }
 
         // POST: IndividualCustomers/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "IndividualCustomerId,Name,Surname,PhoneNumber,City,Adress,SalesAgentId")] IndividualCustomer individualCustomer)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(individualCustomer).State = EntityState.Modified;
-                db.SaveChanges();
+                _individualCustomerRepository.Update(individualCustomer);
                 return RedirectToAction("Index");
             }
-            ViewBag.SalesAgentId = new SelectList(db.SalesAgent, "SalesAgentId", "Name", individualCustomer.SalesAgentId);
+            ViewBag.SalesAgentId = new SelectList(_salesAgentRepository.Get().Fetch(), "SalesAgentId", "Name", individualCustomer.SalesAgentId);
             return View(individualCustomer);
         }
 
@@ -101,7 +103,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            IndividualCustomer individualCustomer = db.IndividualCustomer.Find(id);
+            IndividualCustomer individualCustomer = _individualCustomerRepository.Get().Where(x => x.IndividualCustomerId == id).Fetch().FirstOrDefault();
             if (individualCustomer == null)
             {
                 return HttpNotFound();
@@ -114,19 +116,11 @@ namespace CRMProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            IndividualCustomer individualCustomer = db.IndividualCustomer.Find(id);
-            db.IndividualCustomer.Remove(individualCustomer);
-            db.SaveChanges();
+            IndividualCustomer individualCustomer = _individualCustomerRepository.Get().Where(x => x.IndividualCustomerId == id).Fetch().FirstOrDefault();
+            _individualCustomerRepository.Delete(individualCustomer);
             return RedirectToAction("Index");
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        
     }
 }

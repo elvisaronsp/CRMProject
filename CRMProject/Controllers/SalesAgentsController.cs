@@ -6,18 +6,25 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using CRMProject.BusinessLogic;
+using CRMProject.Interfaces;
 using CRMProject.Models;
 
 namespace CRMProject.Controllers
 {
     public class SalesAgentsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private readonly ISalesAgentRepository _salesAgentRepository;
+
+        public SalesAgentsController(ISalesAgentRepository _salesAgentRepository)
+        {
+            this._salesAgentRepository = _salesAgentRepository;
+        }
 
         // GET: SalesAgents
         public ActionResult Index()
         {
-            return View(db.SalesAgent.ToList());
+            return View(_salesAgentRepository.Get().Where(x=>x.SalesAgentId > 0).Fetch());
         }
 
         // GET: SalesAgents/Details/5
@@ -27,7 +34,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SalesAgent salesAgent = db.SalesAgent.Find(id);
+            SalesAgent salesAgent = _salesAgentRepository.Get().Where(x => x.SalesAgentId == id).Fetch().FirstOrDefault();
             if (salesAgent == null)
             {
                 return HttpNotFound();
@@ -46,13 +53,22 @@ namespace CRMProject.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "SalesAgentId,Name,Surname,Rank,PhoneNumber,HireDate,SaleValue,Sales")] SalesAgent salesAgent)
+        public ActionResult Create( SalesAgent salesAgent)
         {
-            if (ModelState.IsValid)
+            var validation = new SalesAgentValidation();
+            var result = validation.Validate(salesAgent);
+
+            if (result.IsValid)
             {
-                db.SalesAgent.Add(salesAgent);
-                db.SaveChanges();
+                _salesAgentRepository.Create(salesAgent);
                 return RedirectToAction("Index");
+            }
+
+            ModelState.Clear();
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.ErrorMessage);
             }
 
             return View(salesAgent);
@@ -65,7 +81,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SalesAgent salesAgent = db.SalesAgent.Find(id);
+            SalesAgent salesAgent = _salesAgentRepository.Get().Where(x => x.SalesAgentId == id).Fetch().FirstOrDefault();
             if (salesAgent == null)
             {
                 return HttpNotFound();
@@ -82,8 +98,7 @@ namespace CRMProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(salesAgent).State = EntityState.Modified;
-                db.SaveChanges();
+                _salesAgentRepository.Update(salesAgent);
                 return RedirectToAction("Index");
             }
             return View(salesAgent);
@@ -96,7 +111,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SalesAgent salesAgent = db.SalesAgent.Find(id);
+            SalesAgent salesAgent = _salesAgentRepository.Get().Where(x => x.SalesAgentId == id).Fetch().FirstOrDefault();
             if (salesAgent == null)
             {
                 return HttpNotFound();
@@ -109,19 +124,11 @@ namespace CRMProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            SalesAgent salesAgent = db.SalesAgent.Find(id);
-            db.SalesAgent.Remove(salesAgent);
-            db.SaveChanges();
+            SalesAgent salesAgent = _salesAgentRepository.Get().Where(x => x.SalesAgentId == id).Fetch().FirstOrDefault();
+            _salesAgentRepository.Delete(salesAgent);
             return RedirectToAction("Index");
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        
     }
 }

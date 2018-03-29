@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using CRMProject.BusinessLogic;
 using CRMProject.Interfaces;
 using CRMProject.Models;
 using CRMProject.Repository;
@@ -15,17 +16,21 @@ namespace CRMProject.Controllers
     public class RealestatesController : Controller
     {
 
-        public readonly IGenericRealestateRepository genericRealestateRepository;
+        private readonly IRealestateRepository _realestateRepository;
 
-        public RealestatesController(IGenericRealestateRepository genericRealestateRepository)
+        public RealestatesController(IRealestateRepository _realestateRepository)
         {
-            this.genericRealestateRepository = genericRealestateRepository;
+            this._realestateRepository = _realestateRepository;
         }
 
         // GET: Realestates
         public ActionResult Index()
         {
-            return View(genericRealestateRepository.GetWhere(x=>x.RealestateId>0));
+            var customers = _realestateRepository.Get()
+                .Where(x => x.RealestateId > 0)
+                .Fetch();
+
+            return View(customers);
         }
 
         // GET: Realestates/Details/5
@@ -35,7 +40,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Realestate realestate = genericRealestateRepository.GetWhere(x=>x.RealestateId == id).FirstOrDefault();
+            Realestate realestate = _realestateRepository.Get().Where(x => x.RealestateId == id).Fetch().FirstOrDefault();
             if (realestate == null)
             {
                 return HttpNotFound();
@@ -54,11 +59,22 @@ namespace CRMProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create( Realestate realestate)
         {
-            if (ModelState.IsValid)
+            var validation = new RealestateValidation();
+            var result = validation.Validate(realestate);
+
+
+            if (result.IsValid)
             {
-                genericRealestateRepository.Create(realestate);
+                _realestateRepository.Create(realestate);
                 
                 return RedirectToAction("Index");
+            }
+
+            ModelState.Clear();
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.ErrorMessage);
             }
 
             return View(realestate);
@@ -71,7 +87,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Realestate realestate = genericRealestateRepository.GetWhere(x => x.RealestateId == id).FirstOrDefault();
+            Realestate realestate = _realestateRepository.Get().Where(x => x.RealestateId == id).Fetch().FirstOrDefault();
             if (realestate == null)
             {
                 return HttpNotFound();
@@ -87,7 +103,7 @@ namespace CRMProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                genericRealestateRepository.Update(realestate);
+                _realestateRepository.Update(realestate);
 
                 return RedirectToAction("Index");
             }
@@ -101,7 +117,7 @@ namespace CRMProject.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Realestate realestate = genericRealestateRepository.GetWhere(x => x.RealestateId == id).FirstOrDefault();
+            Realestate realestate = _realestateRepository.Get().Where(x => x.RealestateId == id).Fetch().FirstOrDefault();
             if (realestate == null)
             {
                 return HttpNotFound();
@@ -114,8 +130,8 @@ namespace CRMProject.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Realestate realestate = genericRealestateRepository.GetWhere(x => x.RealestateId == id).FirstOrDefault();
-            genericRealestateRepository.Delete(realestate);
+            Realestate realestate = _realestateRepository.Get().Where(x => x.RealestateId == id).Fetch().FirstOrDefault();
+            _realestateRepository.Delete(realestate);
 
             return RedirectToAction("Index");
 

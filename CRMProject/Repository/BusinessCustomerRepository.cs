@@ -7,7 +7,7 @@ using System.Web;
 
 namespace CRMProject.Repository
 {
-    public class GenericRealestateRepository : AbstractRepository<Realestate>, IGenericRealestateRepository
+    public class BusinessCustomerRepository: AbstractRepository<BusinessCustomer>, IBusinessCustomerRepository
     {
     }
 }

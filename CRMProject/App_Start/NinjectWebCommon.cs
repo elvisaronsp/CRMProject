@@ -65,10 +65,10 @@ namespace CRMProject.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<IGenericRealestateRepository>().To<GenericRealestateRepository>();
-            kernel.Bind<IGenericIndividualCustomerRepository>().To<GenericIndividualCustomerRepository>();
-            kernel.Bind<IGenericBusinessCustomerRepository>().To<GenericBusinessCustomerRepository>();
-            kernel.Bind<IGenericSalesAgentRepository>().To<GenericSalesAgentRepository>();
+            kernel.Bind<IRealestateRepository>().To<RealestateRepository>();
+            kernel.Bind<IIndividualCustomerRepository>().To<IndividualCustomerRepository>();
+            kernel.Bind<IBusinessCustomerRepository>().To<BusinessCustomerRepository>();
+            kernel.Bind<ISalesAgentRepository>().To<SalesAgentRepository>();
             //kernel.Bind<ICheckAuthorisation>().To<CheckAuthorisation>();
             //kernel.Bind<IControllerLogic>().To<ControllerLogic>();
         }
